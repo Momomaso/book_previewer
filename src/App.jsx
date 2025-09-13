@@ -5,12 +5,6 @@ export default function App() {
   const [previewUrl, setPreviewUrl] = useState(null)
   const fileInputRef = useRef(null)
 
-  const handleDrop = (e) => {
-    e.preventDefault()
-    const droppedFile = e.dataTransfer.files[0]
-    handleFile(droppedFile)
-  }
-
   const handleFile = (selectedFile) => {
     if (selectedFile) {
       setFile(selectedFile)
@@ -18,28 +12,21 @@ export default function App() {
     }
   }
 
-  const handleDragOver = (e) => {
-    e.preventDefault()
-  }
-
   const handleClick = () => {
     fileInputRef.current.click()
   }
 
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0]
-    handleFile(selectedFile)
+    handleFile(e.target.files[0])
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 20 }}>
       <h1>📖 Book Previewer</h1>
 
-      {/* منطقة السحب والإفلات + الكليك */}
+      {/* المستطيل */}
       <div
         onClick={handleClick}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
         style={{
           width: '80%',
           height: 200,
@@ -52,7 +39,7 @@ export default function App() {
           cursor: 'pointer'
         }}
       >
-        <p>Click or Drag & Drop your PDF/Image here</p>
+        <p>Click here to upload PDF/Image</p>
         <input
           type="file"
           accept="application/pdf,image/*"

@@ -1,15 +1,20 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 
 export default function App() {
   const [file, setFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
+  const fileInputRef = useRef(null)
 
   const handleDrop = (e) => {
     e.preventDefault()
     const droppedFile = e.dataTransfer.files[0]
-    if (droppedFile) {
-      setFile(droppedFile)
-      setPreviewUrl(URL.createObjectURL(droppedFile))
+    handleFile(droppedFile)
+  }
+
+  const handleFile = (selectedFile) => {
+    if (selectedFile) {
+      setFile(selectedFile)
+      setPreviewUrl(URL.createObjectURL(selectedFile))
     }
   }
 
@@ -17,10 +22,22 @@ export default function App() {
     e.preventDefault()
   }
 
+  const handleClick = () => {
+    fileInputRef.current.click()
+  }
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0]
+    handleFile(selectedFile)
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 20 }}>
       <h1>📖 Book Previewer</h1>
+
+      {/* منطقة السحب والإفلات + الكليك */}
       <div
+        onClick={handleClick}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         style={{
@@ -31,11 +48,21 @@ export default function App() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: 20
+          marginBottom: 20,
+          cursor: 'pointer'
         }}
       >
-        <p>Drag & Drop your PDF or Image here</p>
+        <p>Click or Drag & Drop your PDF/Image here</p>
+        <input
+          type="file"
+          accept="application/pdf,image/*"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
+        />
       </div>
+
+      {/* المعاينة */}
       {previewUrl && (
         <div style={{ width: '90%', height: '80vh' }}>
           {file.type === 'application/pdf' ? (

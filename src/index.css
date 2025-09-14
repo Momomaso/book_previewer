@@ -1,48 +1,25 @@
-/* Reset أساسي */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.container {
+  text-align: center;
+  padding: 20px;
 }
 
-/* خلفية وتهيئة عامة */
-body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #f9f9f9, #ececec);
-  color: #333;
-  line-height: 1.5;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 40px;
+.upload-box {
+  margin-bottom: 20px;
 }
 
-/* الحاوية الأساسية */
-#root {
-  width: 100%;
-  max-width: 1200px;
-}
-
-/* أزرار التحميل */
-label {
-  display: inline-block;
-  margin: 0 10px;
-  font-weight: 600;
-  color: #444;
-  cursor: pointer;
-}
-
-input[type="file"] {
-  display: block;
-  margin-top: 5px;
-  padding: 6px;
-  border: 1px solid #ccc;
+.upload-btn {
+  background: #007bff;
+  color: #fff;
+  padding: 10px 18px;
   border-radius: 6px;
-  font-size: 14px;
+  cursor: pointer;
+  font-weight: 600;
 }
 
-/* الحاوية الخاصة بالكتاب */
+.upload-btn input {
+  display: none;
+}
+
 .book-viewer {
   display: flex;
   justify-content: center;
@@ -52,37 +29,39 @@ input[type="file"] {
   border-radius: 12px;
   background: #fff;
   padding: 20px;
-  min-height: 420px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  min-height: 500px;
+  margin-bottom: 20px;
+  position: relative;
 }
 
-/* الصفحات */
-.book-viewer img {
+.page-wrapper {
+  position: relative;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  background: #fafafa;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* أزرار التنقل */
-button {
-  background: #007bff;
-  color: #fff;
-  border: none;
-  padding: 10px 18px;
-  margin: 0 5px;
-  font-size: 14px;
-  font-weight: bold;
+  overflow: hidden;
   border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.2s ease-in-out;
 }
 
-button:hover:not(:disabled) {
-  background: #0056b3;
+.cover {
+  flex: 1;
+  display: flex;
+  justify-content: center;
 }
 
-button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
+.trim-lines {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  border: 2px dashed red; /* Trim */
+  pointer-events: none;
+}
+.trim-lines::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  border: 1px dashed blue; /* Safe zone */
 }

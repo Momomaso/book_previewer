@@ -1,22 +1,28 @@
 import { useState } from "react";
+import { Document, Page, pdfjs } from "react-pdf";
+import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import "react-pdf/dist/esm/Page/TextLayer.css";
+import "./index.css";
+
+// إعداد مكتبة PDF.js
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 export default function BookPreviewer() {
-  const [cover, setCover] = useState(null);
-  const [pages, setPages] = useState([]);
+  const [file, setFile] = useState(null);
+  const [numPages, setNumPages] = useState(null);
   const [spreadIndex, setSpreadIndex] = useState(0);
 
-  const handleCoverUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) setCover(URL.createObjectURL(file));
+  const onFileChange = (e) => {
+    setFile(e.target.files[0]);
+    setSpreadIndex(0);
   };
 
-  const handleContentUpload = (e) => {
-    const files = Array.from(e.target.files);
-    setPages(files.map((f) => URL.createObjectURL(f)));
+  const onDocumentLoadSuccess = ({ numPages }) => {
+    setNumPages(numPages);
   };
 
   const nextSpread = () => {
-    if (spreadIndex < Math.ceil(pages.length / 2)) {
+    if (spreadIndex < Math.ceil(numPages / 2)) {
       setSpreadIndex(spreadIndex + 1);
     }
   };
@@ -26,76 +32,74 @@ export default function BookPreviewer() {
   };
 
   return (
-    <div style={{ textAlign: "center" }}>
-      {/* Upload buttons */}
-      <div style={{ marginBottom: 20 }}>
-        <label>
-          Upload Cover:
-          <input type="file" accept="image/*" onChange={handleCoverUpload} />
-        </label>
-        <label style={{ marginLeft: 20 }}>
-          Upload Content (multiple images):
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleContentUpload}
-          />
+    <div className="container">
+      {/* رفع الملف */}
+      <div className="upload-box">
+        <label className="upload-btn">
+          Upload PDF (Cover + Content)
+          <input type="file" accept="application/pdf" onChange={onFileChange} />
         </label>
       </div>
 
-      {/* Book viewer */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 10,
-          border: "1px solid #ccc",
-          padding: 20,
-          minHeight: 400,
-        }}
-      >
-        {spreadIndex === 0 ? (
-          // Show cover only
-          cover && (
-            <img
-              src={cover}
-              alt="Cover"
-              style={{ maxWidth: "400px", maxHeight: "600px" }}
-            />
-          )
-        ) : (
-          <>
-            {/* Left page */}
-            {pages[(spreadIndex - 1) * 2] && (
-              <img
-                src={pages[(spreadIndex - 1) * 2]}
-                alt="Left Page"
-                style={{ maxWidth: "300px", maxHeight: "500px" }}
-              />
+      {/* المشاهد */}
+      <div className="book-viewer">
+        {file && (
+          <Document file={file} onLoadSuccess={onDocumentLoadSuccess}>
+            {/* أول صفحة = الغلاف */}
+            {spreadIndex === 0 ? (
+              <div className="page-wrapper cover">
+                <Page
+                  pageNumber={1}
+                  width={400}
+                  renderAnnotationLayer={false}
+                  renderTextLayer={false}
+                />
+                <div className="trim-lines"></div>
+              </div>
+            ) : (
+              <>
+                {/* صفحة يسار */}
+                <div className="page-wrapper">
+                  {spreadIndex * 2 - 1 <= numPages && (
+                    <>
+                      <Page
+                        pageNumber={spreadIndex * 2}
+                        width={350}
+                        renderAnnotationLayer={false}
+                        renderTextLayer={false}
+                      />
+                      <div className="trim-lines"></div>
+                    </>
+                  )}
+                </div>
+                {/* صفحة يمين */}
+                <div className="page-wrapper">
+                  {spreadIndex * 2 + 1 <= numPages && (
+                    <>
+                      <Page
+                        pageNumber={spreadIndex * 2 + 1}
+                        width={350}
+                        renderAnnotationLayer={false}
+                        renderTextLayer={false}
+                      />
+                      <div className="trim-lines"></div>
+                    </>
+                  )}
+                </div>
+              </>
             )}
-            {/* Right page */}
-            {pages[(spreadIndex - 1) * 2 + 1] && (
-              <img
-                src={pages[(spreadIndex - 1) * 2 + 1]}
-                alt="Right Page"
-                style={{ maxWidth: "300px", maxHeight: "500px" }}
-              />
-            )}
-          </>
+          </Document>
         )}
       </div>
 
-      {/* Navigation */}
-      <div style={{ marginTop: 20 }}>
+      {/* أزرار التنقل */}
+      <div className="nav-btns">
         <button onClick={prevSpread} disabled={spreadIndex === 0}>
           ⬅ Prev
         </button>
         <button
           onClick={nextSpread}
-          disabled={spreadIndex >= Math.ceil(pages.length / 2)}
-          style={{ marginLeft: 20 }}
+          disabled={spreadIndex >= Math.ceil(numPages / 2)}
         >
           Next ⮕
         </button>

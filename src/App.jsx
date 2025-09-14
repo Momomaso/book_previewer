@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
+import { Document, Page, pdfjs } from "react-pdf/dist/esm/entry.vite";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import "./index.css";
@@ -50,9 +50,9 @@ export default function BookPreviewer() {
               <div className="page-wrapper cover">
                 <Page
                   pageNumber={1}
-                  width={400}
                   renderAnnotationLayer={false}
                   renderTextLayer={false}
+                  className="cover-page"
                 />
                 <div className="trim-lines"></div>
               </div>

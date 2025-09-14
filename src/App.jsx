@@ -1,64 +1,105 @@
-import React, { useState, useRef } from 'react'
+import { useState } from "react";
 
-export default function App() {
-  const [file, setFile] = useState(null)
-  const [previewUrl, setPreviewUrl] = useState(null)
-  const fileInputRef = useRef(null)
+export default function BookPreviewer() {
+  const [cover, setCover] = useState(null);
+  const [pages, setPages] = useState([]);
+  const [spreadIndex, setSpreadIndex] = useState(0);
 
-  const handleFile = (selectedFile) => {
-    if (selectedFile) {
-      setFile(selectedFile)
-      setPreviewUrl(URL.createObjectURL(selectedFile))
+  const handleCoverUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) setCover(URL.createObjectURL(file));
+  };
+
+  const handleContentUpload = (e) => {
+    const files = Array.from(e.target.files);
+    setPages(files.map((f) => URL.createObjectURL(f)));
+  };
+
+  const nextSpread = () => {
+    if (spreadIndex < Math.ceil(pages.length / 2)) {
+      setSpreadIndex(spreadIndex + 1);
     }
-  }
+  };
 
-  const handleClick = () => {
-    fileInputRef.current.click()
-  }
-
-  const handleFileChange = (e) => {
-    handleFile(e.target.files[0])
-  }
+  const prevSpread = () => {
+    if (spreadIndex > 0) setSpreadIndex(spreadIndex - 1);
+  };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 20 }}>
-      <h1>📖 Book Previewer</h1>
-
-      {/* المستطيل */}
-      <div
-        onClick={handleClick}
-        style={{
-          width: '80%',
-          height: 200,
-          border: '2px dashed #888',
-          borderRadius: 10,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: 20,
-          cursor: 'pointer'
-        }}
-      >
-        <p>Click here to upload PDF/Image</p>
-        <input
-          type="file"
-          accept="application/pdf,image/*"
-          ref={fileInputRef}
-          style={{ display: 'none' }}
-          onChange={handleFileChange}
-        />
+    <div style={{ textAlign: "center" }}>
+      {/* Upload buttons */}
+      <div style={{ marginBottom: 20 }}>
+        <label>
+          Upload Cover:
+          <input type="file" accept="image/*" onChange={handleCoverUpload} />
+        </label>
+        <label style={{ marginLeft: 20 }}>
+          Upload Content (multiple images):
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleContentUpload}
+          />
+        </label>
       </div>
 
-      {/* المعاينة */}
-      {previewUrl && (
-        <div style={{ width: '90%', height: '80vh' }}>
-          {file.type === 'application/pdf' ? (
-            <embed src={previewUrl} type="application/pdf" width="100%" height="100%" />
-          ) : (
-            <img src={previewUrl} alt="Preview" style={{ maxWidth: '100%', maxHeight: '100%' }} />
-          )}
-        </div>
-      )}
+      {/* Book viewer */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 10,
+          border: "1px solid #ccc",
+          padding: 20,
+          minHeight: 400,
+        }}
+      >
+        {spreadIndex === 0 ? (
+          // Show cover only
+          cover && (
+            <img
+              src={cover}
+              alt="Cover"
+              style={{ maxWidth: "400px", maxHeight: "600px" }}
+            />
+          )
+        ) : (
+          <>
+            {/* Left page */}
+            {pages[(spreadIndex - 1) * 2] && (
+              <img
+                src={pages[(spreadIndex - 1) * 2]}
+                alt="Left Page"
+                style={{ maxWidth: "300px", maxHeight: "500px" }}
+              />
+            )}
+            {/* Right page */}
+            {pages[(spreadIndex - 1) * 2 + 1] && (
+              <img
+                src={pages[(spreadIndex - 1) * 2 + 1]}
+                alt="Right Page"
+                style={{ maxWidth: "300px", maxHeight: "500px" }}
+              />
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Navigation */}
+      <div style={{ marginTop: 20 }}>
+        <button onClick={prevSpread} disabled={spreadIndex === 0}>
+          ⬅ Prev
+        </button>
+        <button
+          onClick={nextSpread}
+          disabled={spreadIndex >= Math.ceil(pages.length / 2)}
+          style={{ marginLeft: 20 }}
+        >
+          Next ⮕
+        </button>
+      </div>
     </div>
-  )
+  );
 }
